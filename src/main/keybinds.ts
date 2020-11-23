@@ -1,6 +1,6 @@
 import {Accelerator, app, globalShortcut, ipcMain, IpcRenderer} from 'electron';
 import MainProcess from "./main-process";
-import {mainWindow} from "./window.ts";
+import {mainWindow} from "./window";
 
 export enum KeybindAction {
     PLAY = "play",
