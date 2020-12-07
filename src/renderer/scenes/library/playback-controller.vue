@@ -152,7 +152,7 @@ function _onPlaybackVolumeUp() {
         <button v-on:click="onPlaybackSpeedUpClick">speed +0.1</button>
         <button v-on:click="onPlaybackVolumeDown">Volume -10%</button>
         <button v-on:click="onPlaybackVolumeUp">Volume +10%</button>
-        <p>Duration: {{ duration }}</p>
+        <p style="font-family: Padauk">Duration: {{ duration }}</p>
         <p>Volume: {{ volume }}</p>
         <p>speed: {{ playbackSpeed }}</p>
         <p>file path: {{ filePath }}</p>

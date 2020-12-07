@@ -53,7 +53,7 @@ module.exports = [
         ]
     },
     {
-        test: /\.(sass|less|css)$/,
+        test: /\.(sass|less|css|scss)$/,
         loaders: ['style-loader', 'css-loader', 'less-loader']
     },
     // Put your webpack loader rules in this array.  This is where you would put

@@ -1,9 +1,14 @@
 <script lang="ts">
 import Sidebar from './sidebar.vue'
+import Icon from './components/icon.vue'
+import ThemeListItem from './components/theme-list-item.vue'
+import { Colors } from './styles'
 
 let state = {
     style: {
-        display: "flex"
+        display: "flex",
+        height: "inherit",
+        backgroundColor: Colors.background
     }
 }
 
@@ -12,7 +17,9 @@ export default {
         return state
     },
     components: {
-        Sidebar
+        Sidebar,
+        Icon,
+        ThemeListItem
     }
 }
 

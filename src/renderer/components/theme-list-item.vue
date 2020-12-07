@@ -1,32 +1,60 @@
 <script lang="ts">
 
 import Vue from "vue";
-
-let state = {
-    hover: false
-}
+import { Colors, Dimens, Styles } from "../styles";
 
 export default Vue.component("ThemeListItem", {
     data: function () {
-        return state
+        return {
+            hover: false,
+            _containerStyle: {
+                display: "flex",
+                paddingLeft: Dimens.sideMargin,
+                paddingRight: Dimens.sideMargin,
+                paddingTop: Dimens.sideMarginHalf,
+                paddingBottom: Dimens.sideMarginHalf,
+                borderRadius: `0px ${Dimens.cornerRadius} ${Dimens.cornerRadius} 0px`,
+                cursor: "pointer"
+            },
+            labelStyle: {
+                ...Styles.buttonText,
+                marginLeft: Dimens.sideMargin,
+            }
+        }
     },
     props: {
         label: {
             type: String
         },
+        icon: {
+            type: String
+        },
         click: {
             type: Function
+        },
+        selected: {
+            type: Boolean,
+            default: false
         }
     },
     computed: {
-        style: function () {
-            if (this.$data.hover)
+        containerStyle: function () {
+            if (this.selected)
                 return {
-                    backgroundColor: "red"
+                    ...this.$data._containerStyle,
+                    backgroundColor: Colors.buttonBackgroundSelected,
+                }
+            if (this.hover)
+                return {
+                    ...this.$data._containerStyle,
+                    backgroundColor: Colors.buttonBackgroundHover,
+                    opacity: "0.85"
                 }
             else
                 return {
-                    backgroundColor: "cyan"
+                    ...this.$data._containerStyle,
+                    backgroundColor: "transparent",
+                    opacity: "0.85"
                 }
         }
     },
@@ -35,13 +63,11 @@ export default Vue.component("ThemeListItem", {
 </script>
 
 <template>
-    <div>
-        <button
-            @mouseover="hover = true"
-            @mouseleave="hover = false"
-            v-on:click="click"
-            v-bind:style="style">
-            label: {{ label }}
-        </button>
+    <div :style="containerStyle"
+    @mouseover="hover = true"
+    @mouseleave="hover = false"
+    v-on:click="click">
+        <Icon :icon="icon"/>
+        <p :style="labelStyle">{{ label }}</p>
     </div>
 </template>

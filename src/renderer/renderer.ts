@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import App from "./app.vue"
-import { router } from './scenes';
-import styles from "./global.scss"
+import { router, Routes } from './scenes/main';
 
 Vue.use(Router);
 
@@ -11,4 +10,4 @@ new Vue({
   router
 }).$mount('#app')
 
-router.replace("/library")
+router.replace(Routes.library)

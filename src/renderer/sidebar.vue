@@ -1,74 +1,65 @@
 <script lang="ts">
 import Vue from 'vue'
-import ThemeListItem from "./components/theme-list-item.vue"
+import { Routes } from './scenes/main'
+import { Colors, Dimens } from './styles'
 
 let state = {
+    Routes: Routes,
     style: {
         height: '100%',
         flexDirection: 'column',
         display: 'flex',
+        backgroundColor: Colors.backgroundContrast,
+        paddingRight: Dimens.sideMargin,
+        paddingTop: Dimens.sideMargin
     },
     aboutStyle: {
         position: "fixed",
         bottom: 0
     },
-    listeningStyle: {},
-    hover: false
+    ahh: "hmm"
 }
-
 export default Vue.component("Sidebar", {
     name: "Sidebar",
     data: function () {
         return state
-    },
-    components: {
-        ThemeListItem
-    },
-    computed: {
-        dah: function () {
-            if (this.$data.hover)
-                return {
-                    backgroundColor: "red"
-                }
-            else
-                return {
-                    backgroundColor: "blue"
-                }
-        }
     },
     methods: {
         onListeningClick: _onListeningClick,
         onLibraryClick: _onLibraryClick,
         onKeybindsClick: _onKeybindsClick,
         onAboutClick: _onAboutClick
+    },
+    computed: {
+        selectedItem() {
+            return path => path === this.$route.path
+        }
     }
 })
 
 function _onListeningClick() {
-    this.$router.push('/listening')
+    this.$router.push(Routes.listening)
 }
 
 function _onLibraryClick() {
-    this.$router.push('/library')
+    this.$router.push(Routes.library)
 }
 
 function _onKeybindsClick() {
-    this.$router.push('/keybinds')
+    this.$router.push(Routes.keybinds)
 }
 
 function _onAboutClick() {
-    this.$router.push('/about')
+    this.$router.push(Routes.about)
 }
-
 
 </script>
 
 <template>
-    <div v-bind:style="style">
-        <p>GUAC</p>
-        <ThemeListItem label="Listening" v-bind:click="onListeningClick"/>
-        <ThemeListItem label="Library" v-bind:click="onLibraryClick"/>
-        <ThemeListItem label="Keybinds" v-bind:click="onKeybindsClick"/>
-        <ThemeListItem label="About" v-bind:style="aboutStyle" v-bind:click="onAboutClick"/>
+    <div :style="style">
+        <ThemeListItem :selected="selectedItem(Routes.listening)" label="Listening" icon="sound-wave" v-bind:click="onListeningClick"/>
+        <ThemeListItem :selected="selectedItem(Routes.library)" label="Library" icon="library" v-bind:click="onLibraryClick"/>
+        <ThemeListItem :selected="selectedItem(Routes.keybinds)" label="Keybinds" icon="keyboard" v-bind:click="onKeybindsClick"/>
+        <ThemeListItem :selected="selectedItem(Routes.about)" label="About" icon="logo-icon" v-bind:style="aboutStyle" v-bind:click="onAboutClick"/>
     </div>
 </template>
