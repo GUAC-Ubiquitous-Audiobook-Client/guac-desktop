@@ -1,14 +1,14 @@
 <script lang="ts">
 
 import Vue from "vue";
-import { Colors, Dimens, Styles } from "../styles";
+import {Colors, Dimens, Styles} from "../styles";
 
 export default Vue.component("ThemeListItem", {
     data: function () {
         return {
             hover: false,
             _containerStyle: {
-                display: "flex",
+                ...Styles.baseButton,
                 paddingLeft: Dimens.sideMargin,
                 paddingRight: Dimens.sideMargin,
                 paddingTop: Dimens.sideMarginHalf,
@@ -18,6 +18,7 @@ export default Vue.component("ThemeListItem", {
             },
             labelStyle: {
                 ...Styles.buttonText,
+                fontSize: "16px",
                 marginLeft: Dimens.sideMargin,
             }
         }
@@ -63,11 +64,11 @@ export default Vue.component("ThemeListItem", {
 </script>
 
 <template>
-    <div :style="containerStyle"
-    @mouseover="hover = true"
-    @mouseleave="hover = false"
-    v-on:click="click">
+    <button :style="containerStyle"
+            @mouseover="hover = true"
+            @mouseleave="hover = false"
+            v-on:click="click">
         <Icon :icon="icon"/>
         <p :style="labelStyle">{{ label }}</p>
-    </div>
+    </button>
 </template>

@@ -28,6 +28,6 @@ export default {
 <template>
     <div v-bind:style="style">
         <Sidebar/>
-        <router-view/>
+        <router-view style="width: 100%"/>
     </div>
 </template>
