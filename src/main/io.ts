@@ -4,7 +4,7 @@ import MainProcess from "./main-process";
 export function importFiles(ipcRenderer: IpcRenderer, fileType: string, extensions: string[]): string[] {
     return ipcRenderer.sendSync('importFiles', [{
         name: fileType,
-        extensions: extensions
+        extensions
     }])
 }
 

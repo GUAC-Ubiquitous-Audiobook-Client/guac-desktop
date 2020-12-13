@@ -25,7 +25,8 @@ export const windowProcess: MainProcess = {
                 return new BrowserWindow({
                     webPreferences: {
                         nodeIntegration: true,
-                        webSecurity: false
+                        webSecurity: false,
+                        enableRemoteModule: true
                     },
                     x: x,
                     y: y,
@@ -43,8 +44,9 @@ export const windowProcess: MainProcess = {
 
             mainWindow = isDevelopment ? debugWindow() : releaseWindow()
 
-            if (isDevelopment)
+            if (isDevelopment) {
                 mainWindow.webContents.openDevTools();
+            }
 
             mainWindow.setBackgroundColor("#333333")
             mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);

@@ -1,13 +1,14 @@
 <script lang="ts">
 import Vue from 'vue'
 import {ipcRenderer} from 'electron'
-import {LibraryItemData} from "./library-item";
-import LibraryItem from './library-item'
+import LibraryItemView from './library-item'
 import {v4 as uuidv4} from 'uuid';
 import {importFiles} from "../../../main/io";
 import {Dimens, Styles} from '../../styles';
+import {LibraryRepository, FileItem} from '../../data/library-repository';
 
 let state = {
+    data: LibraryRepository.instance.data,
     Styles: Styles,
     containerStyle: {
         height: '100%',
@@ -44,45 +45,18 @@ let state = {
         ...Styles.buttonSecondary
     },
     filesContainer: {},
-    items: [
-        {
-            id: "1",
-            name: "/Users/curli/Books/Early Period, Volume 1/08. Menexenus.mp3",
-            onItemClick: function (id: string) {
-                _onItemClick(("1"))
-            }
-        },
-        {
-            id: "2",
-            name: "/Users/curli/Books/Early Period, Volume 1/09. Ion.mp3",
-            onItemClick: function (id: string) {
-                _onItemClick(("2"))
-            }
-        }
-    ] as LibraryItemData[],
-    selectedItemId: null as string | null,
     autoImportDir: "D/:"
 }
 
 function _onImportFilesClick() {
     let res = importFiles(ipcRenderer, "All", [])
-    state.items = res.map(function (val): LibraryItemData {
-        let id = uuidv4()
-        return {
-            id: id,
-            name: val.substring(val.lastIndexOf('/') + 1),
-            onItemClick: _onItemClick(id)
-        }
-    });
-}
-
-function _onItemClick(fileId: string) {
-    state.selectedItemId = fileId
+    LibraryRepository.instance.addLibraryItem(res)
 }
 
 export default Vue.component("library", {
-    components: {LibraryItem},
+    components: {LibraryItemView},
     data: function () {
+        console.log(state.data) //this reference makes state.data reactive
         return state
     },
     methods: {
@@ -92,6 +66,11 @@ export default Vue.component("library", {
         selectedFilePath: function () {
             let id = this.$data.selectedFileId
             return this.$data.files.filter(file => file.id == id)[0]?.filePath
+        },
+        items: function () {
+            return this.$data.data.libraryItems.map(function (val): string {
+                return val.id
+            })
         }
     },
     created() {
@@ -110,13 +89,13 @@ export default Vue.component("library", {
                     <p :style="Styles.buttonText">Change</p>
                 </button>
             </div>
-            <button :style="importFilesButtonStyle">
+            <button :style="importFilesButtonStyle" v-on:click="onImportFilesClick">
                 <p :style="Styles.buttonText">Import file(s)</p>
             </button>
         </div>
 
         <div v-bind:style="filesContainer">
-            <LibraryItem v-for="item in items" v-bind:data="item" v-bind:key="item.id"/>
+            <LibraryItemView v-for="item in items" v-bind:libraryItemId="item" v-bind:key="item"/>
         </div>
     </div>
 </template>

@@ -1,29 +1,27 @@
 <script lang="ts">
 import Vue, {PropType} from "vue";
+import { LibraryRepository, LibraryItem } from "../../data/library-repository";
 
-export interface LibraryItemData {
-    id: string
-    name: string
-    onItemClick: (string) => void
-}
-
-export default Vue.component("LibraryItem", {
-    name: "LibraryItem",
+export default Vue.component("LibraryItemView", {
+    name: "LibraryItemView",
     props: {
-        data: {
-            type: Object as PropType<LibraryItemData>,
+        libraryItemId: {
+            type: String,
             required: true
         }
     },
     data: function () {
-        return {
-            playedPercentage: 1,
-            style: {}
-        }
+        return {}
     },
     computed: {
+        itemData: function(): LibraryItem {
+            return LibraryRepository.instance.data.libraryItems.filter(item => item.id == this.libraryItemId)[0]
+        },
         text: function () {
-            return `${this.data.name}`
+            return this.itemData.name
+        },
+        fileCount: function(): string {
+            return this.itemData.files.length
         }
     },
     methods: {

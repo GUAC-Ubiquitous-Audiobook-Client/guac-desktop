@@ -10,7 +10,6 @@ export enum Routes {
 interface Route {
     path: string
     component: any
-    redirect?: string
 }
 
 const routes: Route[] = [
