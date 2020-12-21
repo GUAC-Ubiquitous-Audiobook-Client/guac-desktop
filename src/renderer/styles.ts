@@ -1,21 +1,29 @@
-export module Colors {
-    export const background: String = "#2D2D2D";
-    export const backgroundContrast: String = "#252525"
-    export const textButtonColor: String = "#fff"
-    export const textTitleColor: String = "#fff"
-    export const buttonBackgroundHover: String = "rgb(255,255,255, 0.04)"
-    export const buttonBackgroundSelected: String = "rgb(255,255,255, 0.08)"
+export namespace Colors {
+    export const background: string = "#2D2D2D";
+    export const backgroundContrast: string = "#252525"
+    export const backgroundContrastSecondary: string = "#202020"
+    export const backgroundContent: string = "#363636"
+    export const backgroundContentBorder: string = "#454545"
+    export const textPrimaryColor: string = "#ffffff"
+    export const textSecondaryColor: string = "#bababa"
+    export const borderColour: string = "#dcdcdc"
+
+    // components
+    export const textButtonColor: string = "#ffffff"
+    export const textTitleColor: string = textPrimaryColor
+    export const buttonBackgroundSelected: string = "rgb(255,255,255, 0.08)"
+    export const buttonBackgroundHover: string = "rgb(255,255,255, 0.04)"
 }
 
-export module Dimens {
-    export const sideMargin: String = "24px"
-    export const sideMarginHalf: String = "12px"
-    export const cornerRadius: String = "12px"
-    export const textButtonSize: String = "14px"
-    export const textTitleSize: String = "42px"
+export namespace Dimens {
+    export const sideMargin: string = "24px"
+    export const sideMarginHalf: string = "12px"
+    export const cornerRadius: string = "12px"
+    export const textButtonSize: string = "14px"
+    export const textTitleSize: string = "42px"
 }
 
-export module Styles {
+export namespace Styles {
     export const buttonText = {
         fontSize: Dimens.textButtonSize,
         color: Colors.textButtonColor,
@@ -34,10 +42,9 @@ export module Styles {
         paddingTop: "8px",
         paddingBottom: "8px",
         borderRadius: `${Dimens.cornerRadius}`,
-        borderColor: "#dcdcdc",
         cursor: "pointer",
-        backgroundColor: "#555",
-        border: "1px solid"
+        backgroundColor: "#555555",
+        border: `1px solid ${Colors.borderColour}`
     }
     export const buttonSecondary = {
         ...baseButton,
@@ -46,10 +53,9 @@ export module Styles {
         paddingTop: "8px",
         paddingBottom: "8px",
         borderRadius: `${Dimens.cornerRadius}`,
-        borderColor: "#dcdcdc",
         cursor: "pointer",
         backgroundColor: "transparent",
-        border: "1px solid"
+        border: `1px solid ${Colors.borderColour}`
     }
     export const titleText = {
         fontSize: Dimens.textTitleSize,

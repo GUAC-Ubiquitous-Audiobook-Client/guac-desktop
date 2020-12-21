@@ -2,6 +2,7 @@
 import Sidebar from './sidebar.vue'
 import Icon from './components/icon.vue'
 import ThemeListItem from './components/theme-list-item.vue'
+import DropdownMenu from './components/dropdown-menu.vue'
 import { Colors } from './styles'
 
 let state = {
@@ -19,8 +20,9 @@ export default {
     components: {
         Sidebar,
         Icon,
-        ThemeListItem
-    }
+        ThemeListItem,
+        DropdownMenu
+    },
 }
 
 </script>

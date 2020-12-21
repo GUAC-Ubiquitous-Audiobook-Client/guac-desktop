@@ -92,12 +92,10 @@ function _onTrackSelected(_filePath: string) {
     player.src = 'file://' + _filePath
     player.load()
     player.oncanplaythrough = (event) => {
-        console.log(player)
         state._trackDuration = player.duration
         player.volume = 0.1
     }
     player.ontimeupdate = (event) => {
-        console.log(event)
         state._trackCurrentSecond = player.currentTime
     }
     player.onratechange = (event) => {

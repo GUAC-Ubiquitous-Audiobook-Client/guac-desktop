@@ -2,10 +2,10 @@
 import Vue from 'vue'
 import {ipcRenderer} from 'electron'
 import LibraryItemView from './library-item'
-import {v4 as uuidv4} from 'uuid';
 import {importFiles} from "../../../main/io";
 import {Dimens, Styles} from '../../styles';
-import {LibraryRepository, FileItem} from '../../data/library-repository';
+import {LibraryRepository} from '../../data/library-repository';
+import DropdownMenu from '@innologica/vue-dropdown-menu'
 
 let state = {
     data: LibraryRepository.instance.data,
@@ -44,7 +44,17 @@ let state = {
     changeAutoImportButtonStyle: {
         ...Styles.buttonSecondary
     },
-    filesContainer: {},
+    booksContainerStyle: {
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr 1fr",
+        gap: Dimens.sideMargin,
+        marginLeft: Dimens.sideMargin,
+        marginRight: Dimens.sideMargin,
+        overflowY: "auto",
+    },
+    bookItemStyle: {
+
+    },
     autoImportDir: "D/:"
 }
 
@@ -56,7 +66,6 @@ function _onImportFilesClick() {
 export default Vue.component("library", {
     components: {LibraryItemView},
     data: function () {
-        console.log(state.data) //this reference makes state.data reactive
         return state
     },
     methods: {
@@ -73,8 +82,6 @@ export default Vue.component("library", {
             })
         }
     },
-    created() {
-    }
 })
 
 </script>
@@ -84,8 +91,10 @@ export default Vue.component("library", {
         <div :style="topBarContainerStyle">
             <div :style="topBarTitleContainerStyle">
                 <p :style="titleStyle">Library</p>
-                <p :style="importingLocationLabelStyle">Automatically importing from {{ autoImportDir }}</p>
-                <button :style="changeAutoImportButtonStyle">
+                <p v-if="false" :style="importingLocationLabelStyle">
+                    Automatically importing from {{ autoImportDir }}
+                </p>
+                <button v-if="false" :style="changeAutoImportButtonStyle">
                     <p :style="Styles.buttonText">Change</p>
                 </button>
             </div>
@@ -94,8 +103,9 @@ export default Vue.component("library", {
             </button>
         </div>
 
-        <div v-bind:style="filesContainer">
-            <LibraryItemView v-for="item in items" v-bind:libraryItemId="item" v-bind:key="item"/>
+        <div v-bind:style="booksContainerStyle">
+            <LibraryItemView :style="bookItemStyle" v-for="item in items" v-bind:libraryItemId="item"
+                             v-bind:key="item"/>
         </div>
     </div>
 </template>
