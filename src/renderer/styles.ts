@@ -21,6 +21,9 @@ export namespace Dimens {
     export const cornerRadius: string = "12px"
     export const textButtonSize: string = "14px"
     export const textTitleSize: string = "42px"
+    export const textBodySize: string = "16px"
+    export const textSubtitleSize: string = "32px"
+    export const iconSize: string = "24px"
 }
 
 export namespace Styles {
@@ -57,9 +60,22 @@ export namespace Styles {
         backgroundColor: "transparent",
         border: `1px solid ${Colors.borderColour}`
     }
+    export const bodyText = {
+        color: Colors.textPrimaryColor,
+        fontSize: Dimens.textBodySize
+    }
     export const titleText = {
         fontSize: Dimens.textTitleSize,
         color: Colors.textTitleColor,
         fontWeight: "bold"
+    }
+    export const subtitleText = {
+        ...titleText,
+        fontSize: "24px",
+    }
+    export const divider = {
+        backgroundColor: Colors.backgroundContentBorder,
+        height: "1px",
+        width: "100%"
     }
 }

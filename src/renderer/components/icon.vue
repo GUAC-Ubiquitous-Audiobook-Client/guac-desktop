@@ -1,10 +1,25 @@
 <script lang="ts">
 
 import Vue from "vue";
+import {Dimens} from "../styles";
+
+export enum Icons {
+    HEADSET = "headset",
+    LOGO_ICON = "logo-icon",
+    SOUND_WAVE = "sound-wave",
+    KEYBOARD = "keyboard",
+    LIBRARY = "library",
+    CONTEXT_VERTICAL = "context-vertical",
+    CROSS = "cross",
+    CHECK = "check",
+    PLAY = "play",
+}
 
 export default Vue.component("Icon", {
     data: function () {
-        return {}
+        return {
+            Icons: Icons
+        }
     },
     props: {
         icon: {
@@ -12,11 +27,11 @@ export default Vue.component("Icon", {
         },
         height: {
             type: String,
-            default: "24"
+            default: Dimens.iconSize
         },
         width: {
             type: String,
-            default: "24"
+            default: Dimens.iconSize
         },
         color: {
             type: String,
@@ -30,7 +45,7 @@ export default Vue.component("Icon", {
 
 <template>
     <div style="display: flex">
-        <svg v-if="icon === 'logo-icon'"
+        <svg v-if="icon === Icons.LOGO_ICON"
              :width="width"
              :height="height"
              viewBox="0 0 247 287">
@@ -44,37 +59,44 @@ export default Vue.component("Icon", {
                 </g>
             </g>
         </svg>
-        <svg v-if="icon === 'headset'"
-             :height="height" viewBox="0 0 24 24" :width="width">
+        <svg v-if="icon === Icons.HEADSET" :height="height" viewBox="0 0 24 24" :width="width">
             <path
                 :fill="color"
                 d="M11.4 1.02C6.62 1.33 3 5.52 3 10.31V17c0 1.66 1.34 3 3 3h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2H5v-1.71C5 6.45 7.96 3.11 11.79 3 15.76 2.89 19 6.06 19 10v2h-2c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1c1.66 0 3-1.34 3-3v-7c0-5.17-4.36-9.32-9.6-8.98z"/>
         </svg>
-        <svg v-if="icon === 'sound-wave'" :height="height" viewBox="0 0 24 24" :width="width">
+        <svg v-if="icon === Icons.SOUND_WAVE" :height="height" viewBox="0 0 24 24" :width="width">
             <path
                 :fill="color"
                 d="M8 18c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1s-1 .45-1 1v10c0 .55.45 1 1 1zm4 4c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1s-1 .45-1 1v18c0 .55.45 1 1 1zm-8-8c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1v2c0 .55.45 1 1 1zm12 4c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1s-1 .45-1 1v10c0 .55.45 1 1 1zm3-7v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/>
         </svg>
-        <svg v-if="icon === 'keyboard'" :height="height" viewBox="0 0 24 24" :width="width">
+        <svg v-if="icon === Icons.KEYBOARD" :height="height" viewBox="0 0 24 24" :width="width">
             <path
                 :fill="color"
                 d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm8 7H9c-.55 0-1-.45-1-1s.45-1 1-1h6c.55 0 1 .45 1 1s-.45 1-1 1zm1-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/>
         </svg>
-        <svg v-if="icon === 'library'" :height="height" viewBox="0 0 24 24" :width="width">
+        <svg v-if="icon === Icons.LIBRARY" :height="height" viewBox="0 0 24 24" :width="width">
             <path :fill="color"
                   d="M12 11.55c-1.82-1.7-4.12-2.89-6.68-3.35C4.11 7.99 3 8.95 3 10.18v6.24c0 1.68.72 2.56 1.71 2.69 2.5.32 4.77 1.35 6.63 2.87.35.29.92.32 1.27.04 1.87-1.53 4.16-2.58 6.68-2.9.94-.13 1.71-1.06 1.71-2.02v-6.92c0-1.23-1.11-2.19-2.32-1.98-2.56.46-4.86 1.65-6.68 3.35zM12 8c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"/>
         </svg>
-        <svg v-if="icon === 'context-vertical'" xmlns="http://www.w3.org/2000/svg" :height="height" viewBox="0 0 24 24"
-             :width="width">
+        <svg v-if="icon === Icons.CONTEXT_VERTICAL" :height="height" viewBox="0 0 24 24" :width="width">
             <path
                 :fill="color"
                 d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
         </svg>
-        <svg v-if="icon === 'cross'" xmlns="http://www.w3.org/2000/svg" :height="height" viewBox="0 0 24 24"
-             :width="width">
+        <svg v-if="icon === Icons.CROSS" :height="height" viewBox="0 0 24 24" :width="width">
             <path
                 :fill="color"
                 d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm4.3 14.3c-.39.39-1.02.39-1.41 0L12 13.41 9.11 16.3c-.39.39-1.02.39-1.41 0-.39-.39-.39-1.02 0-1.41L10.59 12 7.7 9.11c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0L12 10.59l2.89-2.89c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41L13.41 12l2.89 2.89c.38.38.38 1.02 0 1.41z"/>
+        </svg>
+        <svg v-if="icon === Icons.PLAY" :height="height" viewBox="0 0 24 24" :width="width">
+            <path
+                :fill="color"
+                d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/>
+        </svg>
+        <svg v-if="icon === Icons.CHECK" :height="height" viewBox="0 0 24 24" :width="width">
+            <path
+                :fill="color"
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM9.29 16.29L5.7 12.7c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0L10 14.17l6.88-6.88c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41l-7.59 7.59c-.38.39-1.02.39-1.41 0z"/>
         </svg>
     </div>
 </template>

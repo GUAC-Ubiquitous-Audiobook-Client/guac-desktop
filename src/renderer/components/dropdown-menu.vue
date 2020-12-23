@@ -23,6 +23,7 @@ export default Vue.component("DropdownMenu", {
         return {
             hover: "",
             containerStyle: {
+                width: "max-content",
                 position: "absolute",
                 backgroundColor: Colors.backgroundContrastSecondary,
                 minWidth: "160px",
@@ -31,7 +32,6 @@ export default Vue.component("DropdownMenu", {
                 boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",
                 border: "1px solid",
                 zIndex: 1,
-                right: 0,
             },
             _itemStyle: {
                 padding: "12px 16px",
@@ -48,7 +48,7 @@ export default Vue.component("DropdownMenu", {
         itemStyle: function () {
             const a = {
                 ...this.$data._itemStyle,
-                backgroundColor: "red"
+                backgroundColor: Colors.buttonBackgroundHover
             }
             const b = {
                 ...this.$data._itemStyle,

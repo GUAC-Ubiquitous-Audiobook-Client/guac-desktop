@@ -1,10 +1,10 @@
 import VueRouter from 'vue-router';
 
 export enum Routes {
-    listening = "/listening",
-    library = "/library",
-    keybinds = "/keybinds",
-    about = "/about",
+    LISTENING = "/listening",
+    LIBRARY = "/library",
+    KEYBINDS = "/keybinds",
+    ABOUT = "/about",
 }
 
 interface Route {
@@ -14,19 +14,19 @@ interface Route {
 
 const routes: Route[] = [
     {
-        path: Routes.listening,
+        path: Routes.LISTENING,
         component: require('./listening/listening.vue').default
     },
     {
-        path: Routes.library,
+        path: Routes.LIBRARY,
         component: require('./library/library.vue').default
     },
     {
-        path: Routes.keybinds,
+        path: Routes.KEYBINDS,
         component: require('./keybinds/keybinds.vue').default
     },
     {
-        path: Routes.about,
+        path: Routes.ABOUT,
         component: require('./about/about.vue').default
     }
 ];
