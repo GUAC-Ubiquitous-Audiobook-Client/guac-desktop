@@ -1,14 +1,12 @@
 import {v4 as uuidv4} from 'uuid';
 import storage from 'electron-json-storage';
-import {FileItem, LibraryItem, LibraryItems} from "./data";
+import {FileItem, LibraryItem} from "./data";
 
 const fs = require("fs")
 const mm = require("musicmetadata")
 
 export interface LibraryRepository {
-    libraryItems: LibraryItems
-
-    selectedLibraryItem: LibraryItemWrapper
+    libraryItems: Data
 
     getThumbnailForFile(filePath: FileItem): Promise<Buffer>
 
@@ -16,7 +14,13 @@ export interface LibraryRepository {
 
     selectLibraryItem(libraryItemId: string)
 
+    selectFileForCurrentLibraryItem(itemId: string)
+
     addLibraryItem(filePaths: string[]): Promise<any>
+
+    addFilesToLibraryItem(filePaths: string[]): Promise<any>
+
+    setFileLengthPlayedForCurrentLibraryItem(length: number)
 }
 
 export class LibraryRepositoryImpl implements LibraryRepository {
@@ -24,15 +28,19 @@ export class LibraryRepositoryImpl implements LibraryRepository {
     private STORAGE_KEY_DATA = "data_books"
     private STORAGE_KEY_SELECTED_LIBRARY_ITEM = "selected_library_item"
 
-    libraryItems: LibraryItems;
-    selectedLibraryItem: LibraryItemWrapper
+    libraryItems: Data;
 
     constructor() {
         this.libraryItems = {
-            data: []
-        }
-        this.selectedLibraryItem = {
-            data: null
+            data: [],
+            selectedItemId: null,
+            getSelectedItem(): LibraryItem | null {
+                return this.data.filter(item => item.id === this.selectedItemId)[0]
+            },
+            getSelectedFileForItem(): FileItem | null {
+                const item = this.getSelectedItem()
+                return item?.files.filter(file => file.id === item.selectedFileId)[0] ?? null
+            }
         }
         const instanceThis = this
         storage.has(this.STORAGE_KEY_DATA, function (error, hasKey) {
@@ -52,11 +60,40 @@ export class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     private setSelectedLibraryItem(itemId: string) {
-        this.selectedLibraryItem.data = this.libraryItems.data.filter(item => item.id === itemId)[0]
+        this.libraryItems.selectedItemId = itemId
+    }
+
+    private setSelectedFileForLibraryItem(itemId: string) {
+        if (this.libraryItems.getSelectedItem() != null) {
+            this.libraryItems.getSelectedItem()!!.selectedFileId = itemId
+        }
+    }
+
+    async _filesWithTags(filePaths: string[]): FileItem[] {
+        const instanceThis = this;
+        const mappedFiles: FileItem[] = []
+        for (const val of filePaths) {
+            const tags = await instanceThis._extractFileId3Tags(val)
+            const duration = await instanceThis._extractFileDuration(val)
+            mappedFiles.push(
+                {
+                    id: uuidv4(),
+                    path: val,
+                    clipLength: duration,
+                    clipLengthPlayed: 0,
+                    tags: {
+                        fileTitle: tags.title,
+                        author: tags.artist[0],
+                        bookName: tags.album,
+                    },
+                    dateAddedTimestamp: new Date().getTime()
+                }
+            )
+        }
+        return mappedFiles
     }
 
     async addLibraryItem(filePaths: string[]) {
-        const instanceThis = this
 
         function extractBookName(files: FileItem[]): string {
             const file = files[0]
@@ -65,34 +102,24 @@ export class LibraryRepositoryImpl implements LibraryRepository {
                     file.path.substring(file.path.lastIndexOf('/') + 1, file.path.lastIndexOf('.'))
         }
 
-        async function filesWithTags(): FileItem[] {
-            const mappedFiles: FileItem[] = []
-            for (const val of filePaths) {
-                const res = await instanceThis._extractFileId3Tags(val)
-                mappedFiles.push(
-                    {
-                        id: uuidv4(),
-                        path: val,
-                        clipLength: 1000,
-                        clipLengthPlayed: 200,
-                        tags: {
-                            fileTitle: res.title,
-                            author: res.artist[0],
-                            bookName: res.album,
-                        }
-                    }
-                )
-            }
-            return mappedFiles
-        }
-
-        const filesTagged = await filesWithTags()
-        const newItem = {
+        const filesTagged = await this._filesWithTags(filePaths)
+        const newItem: LibraryItem = {
             id: uuidv4(),
             name: extractBookName(filesTagged),
-            files: filesTagged
+            files: filesTagged,
+            selectedFileId: null,
+            dateAddedTimestamp: new Date().getTime()
         }
         this.libraryItems.data.push(newItem)
+        this._saveData(this.libraryItems)
+    }
+
+    async addFilesToLibraryItem(filePaths: string[]) {
+        const newItems = await this._filesWithTags(filePaths)
+        const libItem = this.libraryItems.getSelectedItem()
+        newItems.forEach(function (value) {
+            libItem?.files.push(value)
+        });
         this._saveData(this.libraryItems)
     }
 
@@ -114,6 +141,18 @@ export class LibraryRepositoryImpl implements LibraryRepository {
         });
     }
 
+    selectFileForCurrentLibraryItem(itemId: string) {
+        this.setSelectedFileForLibraryItem(itemId)
+        this._saveData(this.libraryItems)
+    }
+
+    setFileLengthPlayedForCurrentLibraryItem(length: number) {
+        if (this.libraryItems.getSelectedFileForItem() != null) {
+            this.libraryItems.getSelectedFileForItem()!!.clipLengthPlayed = length
+        }
+        this._saveData(this.libraryItems)
+    }
+
     async _saveData(newData) {
         storage.set(this.STORAGE_KEY_DATA, newData, function (error) {
             if (error) {
@@ -122,9 +161,9 @@ export class LibraryRepositoryImpl implements LibraryRepository {
         });
     }
 
-    async _extractFileId3Tags(val) {
+    async _extractFileId3Tags(filePath) {
         return new Promise(function (resolve, reject) {
-            const readableStream = fs.createReadStream(val)
+            const readableStream = fs.createReadStream(filePath)
             mm(readableStream, function (err, metadata) {
                 if (err) {
                     resolve(err)
@@ -136,8 +175,28 @@ export class LibraryRepositoryImpl implements LibraryRepository {
         })
     }
 
+    async _extractFileDuration(filePath) {
+        return new Promise<number>(function (resolve, reject) {
+            const player: HTMLAudioElement = new Audio()
+            player.src = 'file://' + filePath
+            player.load()
+            player.oncanplaythrough = (event) => {
+                resolve(player.duration)
+            }
+        })
+    }
+
 }
 
-export interface LibraryItemWrapper {
-    data: LibraryItem | null
+export interface Data {
+    data: LibraryItem[]
+    selectedItemId: string | null
+
+    getSelectedItem(): LibraryItem | null
+
+    getSelectedFileForItem(): FileItem | null
+}
+
+export interface FileItemWrapper {
+    data: FileItem | null
 }

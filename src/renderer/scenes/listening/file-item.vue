@@ -2,9 +2,11 @@
     <div v-bind:style="containerStyle">
         <div :style="contextContainerStyle" v-on:click="onContextMenuClick">
             <Icon :style="contextIconStyle" :icon="Icons.CONTEXT_VERTICAL"/>
-            <DropdownMenu v-if="showDropdown" :items="dropdownItems" />
+            <DropdownMenu v-if="showDropdown" :items="dropdownItems"/>
         </div>
-        <Icon :style="playIconStyle" :icon="Icons.PLAY"/>
+        <div :style="playIconContainerStyle" v-on:click="onPlayClick">
+            <Icon :icon="Icons.PLAY"/>
+        </div>
         <div :style="labelsContainerStyle">
             <p :style="nameStyle">{{ fileName }}</p>
             <p :style="durationStyle">{{ duration }}</p>
@@ -21,6 +23,11 @@ import {LibraryRepositoryProvider} from "../../data/provider";
 import {FileItem} from "../../data/data";
 import {Icons} from "../../components/icon.vue";
 import {DropdownItem} from "../../components/dropdown-menu.vue";
+import {DateUtils} from "../../date";
+
+const dayjs = require('dayjs')
+const duration = require('dayjs/plugin/duration')
+dayjs.extend(duration)
 
 export default Vue.component("FileItem", {
     name: "FileItem",
@@ -33,7 +40,7 @@ export default Vue.component("FileItem", {
     data: function () {
         return {
             Icons: Icons,
-            containerStyle: {
+            _containerStyle: {
                 ...Styles.bodyText,
                 display: "flex",
                 paddingLeft: Dimens.sideMargin,
@@ -45,9 +52,8 @@ export default Vue.component("FileItem", {
                 cursor: "pointer",
                 position: "relative"
             },
-            contextIconStyle: {
-            },
-            playIconStyle: {
+            contextIconStyle: {},
+            playIconContainerStyle: {
                 marginLeft: Dimens.sideMargin,
                 cursor: "pointer"
             },
@@ -99,18 +105,33 @@ export default Vue.component("FileItem", {
             return LibraryRepositoryProvider.libraryRepository.getFileName(this.data)
         },
         duration: function (): string {
-            return "1h 20m"
+            return DateUtils.formatDuration(dayjs.duration(this.data.clipLength * 1000))
         },
         dateAdded: function (): string {
-            return "dd-mm-yyyy"
+            return dayjs(this.data.dateAddedTimestamp).format("DD-MM-YYYY")
+        },
+        _playedPercentage: function (): string {
+            return ((this.data.clipLengthPlayed / this.data.clipLength || 0) * 100).toFixed(0)
         },
         playedPercentage: function (): string {
-            return "100% played"
+            return this._playedPercentage + "% played"
+        },
+        containerStyle: function () {
+            if (this._playedPercentage == 100) {
+                return {
+                    ...this.$data._containerStyle,
+                    opacity: 0.4
+                }
+            } else {
+                return {
+                    ...this.$data._containerStyle
+                }
+            }
         }
     },
     methods: {
-        onClick: function (e) {
-            this.data.onItemClick(this.data.id)
+        onPlayClick: function (e) {
+            LibraryRepositoryProvider.libraryRepository.selectFileForCurrentLibraryItem(this.data.id)
         },
         onContextMenuClick: function (e) {
             this.$data.showDropdown = !this.$data.showDropdown

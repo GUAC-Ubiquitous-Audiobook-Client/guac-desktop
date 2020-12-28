@@ -11,7 +11,7 @@
                 </button>
             </div>
             <button :style="importFilesButtonStyle" v-on:click="onImportFilesClick">
-                <p :style="Styles.buttonText">Import file(s)</p>
+                <p :style="Styles.buttonPrimaryText">Import file(s)</p>
             </button>
             <div :style="topBarDividerStyle"/>
         </div>

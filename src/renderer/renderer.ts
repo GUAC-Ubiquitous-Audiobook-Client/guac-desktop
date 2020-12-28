@@ -10,4 +10,4 @@ new Vue({
     router
 }).$mount('#app')
 
-router.replace(Routes.library)
+router.replace(Routes.LIBRARY)

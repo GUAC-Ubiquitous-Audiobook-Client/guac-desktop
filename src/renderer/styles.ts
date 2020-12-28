@@ -1,4 +1,6 @@
 export namespace Colors {
+    export const accent: string = "#ffffff";
+    export const accentLight: string = "#8a8a8a";
     export const background: string = "#2D2D2D";
     export const backgroundContrast: string = "#252525"
     export const backgroundContrastSecondary: string = "#202020"
@@ -18,6 +20,7 @@ export namespace Colors {
 export namespace Dimens {
     export const sideMargin: string = "24px"
     export const sideMarginHalf: string = "12px"
+    export const sideMarginDouble: string = "48px"
     export const cornerRadius: string = "12px"
     export const textButtonSize: string = "14px"
     export const textTitleSize: string = "42px"
@@ -30,6 +33,11 @@ export namespace Styles {
     export const buttonText = {
         fontSize: Dimens.textButtonSize,
         color: Colors.textButtonColor,
+        fontWeight: "bold",
+    }
+    export const buttonPrimaryText = {
+        fontSize: Dimens.textButtonSize,
+        color: Colors.background,
         fontWeight: "bold",
     }
     export const baseButton = {
@@ -46,7 +54,7 @@ export namespace Styles {
         paddingBottom: "8px",
         borderRadius: `${Dimens.cornerRadius}`,
         cursor: "pointer",
-        backgroundColor: "#555555",
+        backgroundColor: Colors.accent,
         border: `1px solid ${Colors.borderColour}`
     }
     export const buttonSecondary = {

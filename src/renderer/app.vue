@@ -3,6 +3,7 @@ import Sidebar from './sidebar.vue'
 import Icon from './components/icon.vue'
 import ThemeListItem from './components/theme-list-item.vue'
 import DropdownMenu from './components/dropdown-menu.vue'
+import ButtonScroller from './components/button-scroller.vue'
 import { Colors } from './styles'
 
 let state = {
@@ -21,7 +22,8 @@ export default {
         Sidebar,
         Icon,
         ThemeListItem,
-        DropdownMenu
+        DropdownMenu,
+        ButtonScroller
     },
 }
 

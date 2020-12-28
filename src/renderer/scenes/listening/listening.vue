@@ -5,13 +5,13 @@
                 <div :style="topBarTitleLabelsContainerStyle">
                     <p :style="topBarTitleStyle">Listening</p>
                     <p :style="topBarPlayingTitleStyle">{{ bookName }}</p>
-                    <button :style="topBarAddFilesButtonStyle">
+                    <button :style="topBarAddFilesButtonStyle" v-on:click="onAddFileClick">
                         <p :style="Styles.buttonText">Add file(s)</p>
                     </button>
                 </div>
                 <div :style="topBarCountdownsContainerStyles">
-                    <p :style="topBarDurationCountdownStyle">0h 10m remaining</p>
-                    <p :style="topBarDurationStyle">total 10h</p>
+                    <p :style="topBarDurationCountdownStyle">{{ durationRemaining }}</p>
+                    <p :style="topBarDurationStyle">{{ durationTotal }}</p>
                 </div>
             </div>
             <div :style="topBarDividerStyle"/>
@@ -28,9 +28,9 @@
         <div :style="tableHeaderDividerStyle"/>
 
         <div v-bind:style="filesContainerStyle">
-            <FileItem v-for="item in files.data.files" v-bind:data="item" v-bind:key="item.id"/>
+            <FileItem v-for="item in files" v-bind:data="item" v-bind:key="item.id" :style="fileItemStyle(item)"/>
         </div>
-        <PlaybackController v-bind:style="playbackContainerStyle" v-bind:filePath="selectedFilePath"/>
+        <PlaybackController v-if="selectedFile != null" v-bind:style="playbackContainerStyle" :file="selectedFile"/>
     </div>
 </template>
 
@@ -40,9 +40,15 @@ import FileItem from './file-item'
 import PlaybackController from './playback-controller'
 import {Colors, Dimens, Styles} from "../../styles";
 import {LibraryRepositoryProvider} from "../../data/provider";
+import {DateUtils} from "../../date";
+import dayjs from "dayjs";
+import {importFiles} from "../../../main/io";
+import {ipcRenderer} from "electron";
+
+const duration = require('dayjs/plugin/duration')
+dayjs.extend(duration)
 
 let state = {
-    data: LibraryRepositoryProvider.libraryRepository.selectedLibraryItem,
     Styles: Styles,
     containerStyle: {
         height: '100%',
@@ -132,8 +138,8 @@ let state = {
         marginTop: 'auto',
         bottom: 0
     },
-    files: LibraryRepositoryProvider.libraryRepository.selectedLibraryItem,
-    selectedFileId: null as string | null
+    filesData: LibraryRepositoryProvider.libraryRepository.libraryItems,
+    selectedFileId: null as string | null,
 }
 
 function _onItemClick(fileId: string) {
@@ -145,15 +151,48 @@ export default Vue.component("listening", {
     data: function () {
         return state
     },
-    methods: {},
     computed: {
-        selectedFilePath: function () {
-            let id = this.$data.selectedFileId
-            return this.$data.files.data.files.filter(file => file.id == id)[0]?.filePath
+        durationTotal: function (): string {
+            const dur = this.$data.filesData.getSelectedItem()?.files.reduce((a, b) => a + b.clipLength, 0)
+            return `total ${DateUtils.formatDuration(dayjs.duration(dur * 1000))}`
+        },
+        durationRemaining: function (): string {
+            const dur = this.$data.filesData.getSelectedItem()?.files.reduce((a, b) => a + b.clipLength, 0)
+            const played = this.$data.filesData.getSelectedItem()?.files.reduce((a, b) => a + b.clipLengthPlayed, 0)
+            return `${DateUtils.formatDuration(dayjs.duration((dur - played) * 1000))} remaining`
+        },
+        files: function () {
+            if (this.$data.filesData.getSelectedItem() !== undefined) {
+                return this.$data.filesData.getSelectedItem().files
+            } else {
+                return []
+            }
         },
         bookName: function (): string {
-            return this.$data.files.data.name
+            if (this.$data.filesData.getSelectedItem() !== undefined) {
+                return this.$data.filesData.getSelectedItem().name
+            } else {
+                return ""
+            }
+        },
+        selectedFile: function (): string {
+            return this.$data.filesData.getSelectedFileForItem()
+        },
+        fileItemStyle: function () {
+            const a = {
+                border: `1px solid ${Colors.accentLight}`
+            }
+            const b = {
+                border: `1px solid transparent`
+            }
+            return (file) => (this.selectedFile != null && this.selectedFile.id === file.id) ? a : b
         }
     },
+    methods: {
+        onAddFileClick: function () {
+            let res = importFiles(ipcRenderer, "All", [])
+            LibraryRepositoryProvider.libraryRepository.addFilesToLibraryItem(res)
+        }
+    }
 })
 </script>

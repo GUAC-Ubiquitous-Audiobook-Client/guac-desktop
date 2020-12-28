@@ -68,7 +68,7 @@
         ],
         "no-namespace": false,
         "no-misused-new": true,
-        "no-non-null-assertion": true,
+        "no-non-null-assertion": false,
         "no-redundant-jsdoc": false,
         "no-shadowed-variable": false,
         "no-string-literal": false,

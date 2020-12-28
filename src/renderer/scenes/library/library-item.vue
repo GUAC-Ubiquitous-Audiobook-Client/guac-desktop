@@ -3,12 +3,12 @@
          v-on:click="onClick"
          @mouseover="hover = true"
          @mouseleave="hover = false">
-        <img v-bind:style="imageStyle" :src="imageSrc"/>
+        <img :style="imageStyle" :src="imageSrc"/>
         <div :style="contentContainerStyle">
             <div :style="labelsContainerStyle">
                 <p :style="nameStyle">{{ text }}</p>
                 <p :style="fileCountStyle">{{ fileCount }} files</p>
-                <p :style="playedPercentageStyle">{{ playedPercentage }}% played</p>
+                <p :style="playedPercentageStyle">{{ playedPercentage }}</p>
             </div>
         </div>
         <div v-if="hover" :style="overlayStyle"></div>
@@ -85,7 +85,10 @@ export default Vue.component("LibraryItemView", {
             return this.itemData.files.length
         },
         playedPercentage: function (): string {
-            return "20"
+            const dur = this.itemData.files.reduce((a, b) => a + b.clipLength, 0)
+            const played = this.itemData.files.reduce((a, b) => a + b.clipLengthPlayed, 0)
+            const perc = ((played / dur || 0) * 100).toFixed(0)
+            return `${perc}% played`
         },
     },
     methods: {

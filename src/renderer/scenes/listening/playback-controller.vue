@@ -1,26 +1,194 @@
+<template>
+    <div v-bind:style="containerStyle">
+        <div :style="dividerStyle"/>
+        <div :style="contentContainerStyle">
+            <div :style="primaryActionsContainerStyle">
+                <img :style="imageStyle" :src="imageSrc"/>
+
+                <div :style="primaryActionsButtonsContainerStyle">
+                    <div :style="skipActionContainerStyle" v-on:click="onPlayClick">
+                        <Icon :icon="Icons.SKIP_PREVIOUS"/>
+                    </div>
+                    <div :style="playActionContainerStyle" v-on:click="onPlayClick">
+                        <Icon :icon="playIcon" :color="Colors.backgroundContent"/>
+                    </div>
+                    <div :style="skipActionContainerStyle" v-on:click="onPlayClick">
+                        <Icon :icon="Icons.SKIP_NEXT"/>
+                    </div>
+
+                </div>
+            </div>
+            <div :style="fileNameContainerStyle">
+                <p :style="fileNameStyle">{{ fileName }}</p>
+                <p :style="fileTotalDurationStyle">{{ durationTotal }}</p>
+            </div>
+            <div :style="rightSideContentContainerStyle">
+                <div :style="detailActionsContainerStyle">
+                    <div :style="forwardActionContainerStyle" v-on:click="onBackwardClick">
+                        <Icon :icon="Icons.BACKWARDS_10" size="32px"/>
+                    </div>
+                    <div :style="forwardActionContainerStyle" v-on:click="onForwardClick">
+                        <Icon :icon="Icons.FORWARD_10" size="32px"/>
+                    </div>
+                    <ButtonScroller :icon="Icons.SPEED" :label="playbackSpeed"
+                                    :scrollDownAction="onPlaybackSpeedDownClick"
+                                    :scrollUpAction="onPlaybackSpeedUpClick"/>
+                    <ButtonScroller :icon="Icons.VOLUME" :label="volume" :scrollDownAction="onPlaybackVolumeDown"
+                                    :scrollUpAction="onPlaybackVolumeUp"/>
+                </div>
+                <div :style="durationDetailsContainerStyle">
+                    <p :style="durationRemainingLabelStyle">{{ durationRemaining }}</p>
+                    <div :style="durationRemainingProgressContainerStyle">
+                        <p :style="durationElapsedLabelStyle">{{ durationElapsed }}</p>
+                        <div :style="durationRemainingProgressBarOuterStyle">
+                            <div :style="durationRemainingProgressBarStyle"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
 <script lang="ts">
-import Vue from "vue";
+import Vue, {PropType} from "vue";
 import {ipcRenderer} from "electron";
 import {KeybindAction} from "../../../main/keybinds";
+import {LibraryRepositoryProvider} from "../../data/provider";
+import {FileItem} from "../../data/data";
+import {Colors, Dimens, Styles} from "../../styles";
+import {Icons} from "../../components/icon.vue";
+import {Duration} from "dayjs/plugin/duration";
+import {DateUtils} from "../../date";
+
+const dayjs = require('dayjs')
+const duration = require('dayjs/plugin/duration')
+dayjs.extend(duration)
 
 let state = {
-    style: {},
+    Icons: Icons,
+    Colors: Colors,
+    containerStyle: {
+        backgroundColor: Colors.backgroundContent,
+    },
+    dividerStyle: {
+        ...Styles.divider
+    },
+    contentContainerStyle: {
+        padding: Dimens.sideMargin,
+        display: "flex"
+    },
+    primaryActionsContainerStyle: {
+        width: "min-content",
+    },
+    primaryActionsButtonsContainerStyle: {
+        width: "30%",
+        display: "flex",
+        gap: "8px",
+        marginTop: Dimens.sideMarginHalf
+    },
+    playActionContainerStyle: {
+        borderRadius: `${Dimens.cornerRadius}`,
+        cursor: "pointer",
+        backgroundColor: Colors.accent,
+        padding: "4px"
+    },
+    skipActionContainerStyle: {
+        border: `1px solid ${Colors.accent}`,
+        borderRadius: `${Dimens.cornerRadius}`,
+        cursor: "pointer",
+        padding: "4px"
+    },
+    imageStyle: {
+        width: "100%",
+        height: "auto",
+        border: `1px solid ${Colors.backgroundContentBorder}`,
+        borderRadius: `${Dimens.cornerRadius}`,
+    },
+    fileNameContainerStyle: {
+        width: "20%"
+    },
+    fileNameStyle: {
+        ...Styles.bodyText,
+        marginLeft: Dimens.sideMarginHalf
+    },
+    fileTotalDurationStyle: {
+        ...Styles.bodyText,
+        marginTop: "8px",
+        marginLeft: Dimens.sideMarginHalf
+    },
+    detailActionsContainerStyle: {
+        display: "flex",
+        gap: "16px",
+        justifyContent: "flex-end"
+    },
+    rightSideContentContainerStyle: {
+        alignContent: "self",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between"
+    },
+    forwardActionContainerStyle: {
+        border: `1px solid ${Colors.accent}`,
+        borderRadius: `${Dimens.cornerRadius}`,
+        cursor: "pointer",
+        padding: "4px"
+    },
+    speedActionContainerStyle: {
+        display: "flex",
+        border: `1px solid ${Colors.accent}`,
+        borderRadius: `${Dimens.cornerRadius}`,
+        cursor: "pointer",
+        padding: "4px",
+        ...Styles.bodyText
+    },
+    durationDetailsContainerStyle: {},
+    durationRemainingProgressContainerStyle: {
+        display: "flex",
+        alignItems: "center"
+    },
+    durationRemainingProgressBarOuterStyle: {
+        width: "100%",
+        height: "12px",
+        border: `1px solid ${Colors.accentLight}`,
+        backgroundColor: Colors.buttonBackgroundHover,
+        borderRadius: `${Dimens.cornerRadius}`,
+        marginLeft: Dimens.sideMarginHalf,
+    },
+    _durationRemainingProgressBarStyle: {
+        width: "0%",
+        height: "100%",
+        borderRadius: `${Dimens.cornerRadius}`,
+        backgroundColor: Colors.accent
+    },
+    durationRemainingLabelStyle: {
+        ...Styles.subtitleText,
+        textAlign: "right",
+    },
+    durationElapsedLabelStyle: {
+        ...Styles.bodyText,
+        marginLeft: Dimens.sideMarginDouble,
+        whiteSpace: "nowrap"
+    },
     _playbackSpeed: 1,
-    _volume: 1,
+    _volume: 0.0,
     _trackDuration: 0,
-    _trackCurrentSecond: 0
+    _trackCurrentSecond: 0,
+    playing: false,
+    imageSrc: "",
 }
 
-let player: HTMLAudioElement
+let player: HTMLAudioElement = new Audio()
 
 export default Vue.component("PlaybackController", {
-    name: "PlaybackController",
     data: function () {
         return state
     },
     props: {
-        filePath: {
-            type: String
+        file: {
+            type: Object as PropType<FileItem>,
+            required: true
         }
     },
     computed: {
@@ -28,15 +196,53 @@ export default Vue.component("PlaybackController", {
             return `${this.$data._trackCurrentSecond} / ${this.$data._trackDuration} `
         },
         playbackSpeed: function () {
+            player.playbackRate = this.$data._playbackSpeed
             return `${this.$data._playbackSpeed.toFixed(2)}x`
         },
         volume: function () {
-            return `${(this.$data._volume * 100).toFixed(0)}%`
+            player.volume = this.$data._volume
+            return `${Math.abs((this.$data._volume * 100).toFixed(0))}%`
+        },
+        fileName: function (): string {
+            LibraryRepositoryProvider.libraryRepository.getThumbnailForFile(this.file.path).then((res) => {
+                this.imageSrc = 'data:image/jpeg;base64,' + res.toString('base64');
+            })
+            _onTrackSelected(this.file)
+            return LibraryRepositoryProvider.libraryRepository.getFileName(this.file)
+        },
+        durationTotal: function (): string {
+            try {
+                const d = dayjs.duration(this.$data._trackDuration * 1000)
+                return DateUtils.formatDuration(d)
+            } catch (e: unknown) {
+                return ""
+            }
+        },
+        durationElapsed: function (): string {
+            const d = dayjs.duration(this.$data._trackCurrentSecond * 1000)
+            return DateUtils.formatDuration(d)
+        },
+        durationRemaining: function (): string {
+            const d = dayjs.duration((this.$data._trackDuration - this.$data._trackCurrentSecond) * 1000)
+            return DateUtils.formatDuration(d) + " remaining"
+        },
+        playIcon: function (): string {
+            if (this.$data.playing) {
+                return Icons.PAUSE
+            } else {
+                return Icons.PLAY
+            }
+        },
+        durationRemainingProgressBarStyle: function () {
+            const a = this.$data._trackCurrentSecond * 100 / this.$data._trackDuration
+            return {
+                ...this.$data._durationRemainingProgressBarStyle,
+                width: `${a}%`
+            }
         }
     },
     methods: {
         onPlayClick: _onPlayClick,
-        onPauseClick: _onPauseClick,
         onBackwardClick: _onBackwardClick,
         onForwardClick: _onForwardClick,
         onPlaybackSpeedUpClick: _onPlaybackSpeedUpClick,
@@ -44,13 +250,7 @@ export default Vue.component("PlaybackController", {
         onPlaybackVolumeDown: _onPlaybackVolumeDown,
         onPlaybackVolumeUp: _onPlaybackVolumeUp
     },
-    watch: {
-        filePath: function (val) {
-            _onTrackSelected(val)
-        }
-    },
     created() {
-        player = new Audio()
         registerKeybindObservers()
     },
 })
@@ -61,9 +261,6 @@ function registerKeybindObservers() {
             switch (action as KeybindAction) {
                 case KeybindAction.PLAY:
                     _onPlayClick()
-                    break;
-                case KeybindAction.PAUSE:
-                    _onPauseClick()
                     break;
                 case KeybindAction.FORWARD:
                     _onForwardClick()
@@ -88,30 +285,30 @@ function registerKeybindObservers() {
     })
 }
 
-function _onTrackSelected(_filePath: string) {
-    player.src = 'file://' + _filePath
+function _onTrackSelected(file: FileItem) {
+    player.src = 'file://' + file.path
     player.load()
     player.oncanplaythrough = (event) => {
         state._trackDuration = player.duration
-        player.volume = 0.1
     }
     player.ontimeupdate = (event) => {
         state._trackCurrentSecond = player.currentTime
+        _saveTrackPlayedLength(player.currentTime)
     }
-    player.onratechange = (event) => {
-        state._playbackSpeed = player.playbackRate
-    };
-    player.onvolumechange = (event) => {
-        state._volume = player.volume
-    }
+}
+
+function _saveTrackPlayedLength(length: number) {
+    LibraryRepositoryProvider.libraryRepository.setFileLengthPlayedForCurrentLibraryItem(length)
 }
 
 function _onPlayClick() {
-    player.play()
-}
-
-function _onPauseClick() {
-    player.pause()
+    if (player.paused) {
+        state.playing = true
+        player.play()
+    } else {
+        state.playing = false
+        player.pause()
+    }
 }
 
 function _onBackwardClick() {
@@ -123,36 +320,35 @@ function _onForwardClick() {
 }
 
 function _onPlaybackSpeedUpClick() {
-    player.playbackRate = player.playbackRate + 0.1
+    if (state._playbackSpeed < 9.99) {
+        state._playbackSpeed += 0.01
+    } else {
+        state._playbackSpeed = 10
+    }
 }
 
 function _onPlaybackSpeedDownClick() {
-    player.playbackRate = player.playbackRate - 0.1
+    if (state._playbackSpeed > 0.01) {
+        state._playbackSpeed -= 0.01
+    } else {
+        state._playbackSpeed = 0
+    }
 }
 
 function _onPlaybackVolumeDown() {
-    player.volume += -0.1
+    if (state._volume > 0.01) {
+        state._volume -= 0.01
+    } else {
+        state._volume = 0
+    }
 }
 
 function _onPlaybackVolumeUp() {
-    player.volume += 0.1
+    if (state._volume < 0.99) {
+        state._volume += 0.01
+    } else {
+        state._volume = 1
+    }
 }
 
 </script>
-
-<template>
-    <div v-bind:style="style">
-        <button v-on:click="onPlayClick">play</button>
-        <button v-on:click="onPauseClick">pause</button>
-        <button v-on:click="onBackwardClick">backward 10s</button>
-        <button v-on:click="onForwardClick">forward 10s</button>
-        <button v-on:click="onPlaybackSpeedDownClick">speed -0.1</button>
-        <button v-on:click="onPlaybackSpeedUpClick">speed +0.1</button>
-        <button v-on:click="onPlaybackVolumeDown">Volume -10%</button>
-        <button v-on:click="onPlaybackVolumeUp">Volume +10%</button>
-        <p style="font-family: Padauk">Duration: {{ duration }}</p>
-        <p>Volume: {{ volume }}</p>
-        <p>speed: {{ playbackSpeed }}</p>
-        <p>file path: {{ filePath }}</p>
-    </div>
-</template>

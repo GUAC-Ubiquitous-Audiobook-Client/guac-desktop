@@ -4,7 +4,6 @@ import {mainWindow} from "./window";
 
 export enum KeybindAction {
     PLAY = "play",
-    PAUSE = "pause",
     FORWARD = "forward",
     BACKWARD = "backward",
     SPEED_UP = "speed_up",
@@ -25,7 +24,7 @@ export const keybindsProcess: MainProcess = {
             _registerKeybind(arg.keybind, arg.action)
         });
         app.whenReady().then(() => {
-            //todo check local data
+            // todo check local data
             // _registerKeybind("f1", KeybindAction.PLAY)
         })
     }
