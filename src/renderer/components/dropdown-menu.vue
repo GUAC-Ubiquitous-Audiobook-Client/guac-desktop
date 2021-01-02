@@ -1,3 +1,15 @@
+<template>
+    <div v-if="show" :style="containerStyle">
+
+        <div v-for="item in items" v-bind:key="item.label" :style="itemStyle(item.label)" v-on:click="item.action"
+             @mouseover="hover = item.label"
+             @mouseleave="hover = ''">
+            <Icon :icon="item.icon"/>
+            <p :style="labelStyle">{{ item.label }}</p>
+        </div>
+    </div>
+</template>
+
 <script lang="ts">
 import Vue, {PropType} from "vue";
 import {Colors, Dimens, Styles} from "../styles";
@@ -17,6 +29,9 @@ export default Vue.component("DropdownMenu", {
         show: {
             type: Boolean,
             default: true
+        },
+        onClickOutside: {
+            type: Function
         }
     },
     data() {
@@ -40,6 +55,7 @@ export default Vue.component("DropdownMenu", {
                 borderRadius: Dimens.cornerRadius,
             },
             labelStyle: {
+                ...Styles.bodyText,
                 marginLeft: Dimens.sideMarginHalf
             }
         }
@@ -56,20 +72,12 @@ export default Vue.component("DropdownMenu", {
             return (label) => (this.hover === label) ? a : b
         }
     },
+    created() {
+        document.body.addEventListener('click', this.onClickOutside)
+    },
     destroyed() {
-        // document.body.removeEventListener('click', this.closeMenu)
+        document.body.removeEventListener('click', this.onClickOutside)
     },
 })
+
 </script>
-
-<template>
-    <div v-if="show" :style="containerStyle">
-
-        <div v-for="item in items" v-bind:key="item.label" :style="itemStyle(item.label)" v-on:click="item.action"
-             @mouseover="hover = item.label"
-             @mouseleave="hover = ''">
-            <Icon :icon="item.icon"/>
-            <p :style="labelStyle">{{ item.label }}</p>
-        </div>
-    </div>
-</template>

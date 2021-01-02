@@ -21,6 +21,10 @@ export interface LibraryRepository {
     addFilesToLibraryItem(filePaths: string[]): Promise<any>
 
     setFileLengthPlayedForCurrentLibraryItem(length: number)
+
+    deleteLibraryItem(itemId: string)
+
+    deleteCurrentSelectedLibraryItem()
 }
 
 export class LibraryRepositoryImpl implements LibraryRepository {
@@ -147,10 +151,23 @@ export class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     setFileLengthPlayedForCurrentLibraryItem(length: number) {
-        if (this.libraryItems.getSelectedFileForItem() != null) {
-            this.libraryItems.getSelectedFileForItem()!!.clipLengthPlayed = length
+        const file = this.libraryItems.getSelectedFileForItem()
+        if (file != null && file.clipLengthPlayed < length) {
+            file!!.clipLengthPlayed = length
+            this._saveData(this.libraryItems)
+        }
+    }
+
+    deleteLibraryItem(itemId: string) {
+        const index = this.libraryItems.data.findIndex(item => item.id === itemId)
+        if (index !== -1) {
+            this.libraryItems.data.splice(index, 1);
         }
         this._saveData(this.libraryItems)
+    }
+
+    deleteCurrentSelectedLibraryItem() {
+        this.deleteLibraryItem(this.libraryItems.getSelectedItem()?.id!!)
     }
 
     async _saveData(newData) {
@@ -195,8 +212,4 @@ export interface Data {
     getSelectedItem(): LibraryItem | null
 
     getSelectedFileForItem(): FileItem | null
-}
-
-export interface FileItemWrapper {
-    data: FileItem | null
 }

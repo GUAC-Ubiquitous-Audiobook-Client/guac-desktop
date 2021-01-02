@@ -70,6 +70,7 @@ let state = {
     },
     importFilesButtonStyle: {
         ...Styles.buttonPrimary,
+        marginTop: Dimens.sideMarginHalf,
         marginLeft: Dimens.sideMargin
     },
     changeAutoImportButtonStyle: {

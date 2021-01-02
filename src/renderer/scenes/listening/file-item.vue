@@ -1,6 +1,6 @@
 <template>
     <div v-bind:style="containerStyle">
-        <div :style="contextContainerStyle" v-on:click="onContextMenuClick">
+        <div v-if="false" :style="contextContainerStyle" v-on:click="onContextMenuClick">
             <Icon :style="contextIconStyle" :icon="Icons.CONTEXT_VERTICAL"/>
             <DropdownMenu v-if="showDropdown" :items="dropdownItems"/>
         </div>
@@ -54,7 +54,7 @@ export default Vue.component("FileItem", {
             },
             contextIconStyle: {},
             playIconContainerStyle: {
-                marginLeft: Dimens.sideMargin,
+                // marginLeft: Dimens.sideMargin,
                 cursor: "pointer"
             },
             labelsContainerStyle: {
@@ -98,6 +98,7 @@ export default Vue.component("FileItem", {
                 marginLeft: "auto",
                 cursor: "pointer"
             },
+            dropdownPopoverShow: true
         }
     },
     computed: {
@@ -135,7 +136,7 @@ export default Vue.component("FileItem", {
         },
         onContextMenuClick: function (e) {
             this.$data.showDropdown = !this.$data.showDropdown
-        }
+        },
     },
 })
 

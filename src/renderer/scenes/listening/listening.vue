@@ -5,9 +5,15 @@
                 <div :style="topBarTitleLabelsContainerStyle">
                     <p :style="topBarTitleStyle">Listening</p>
                     <p :style="topBarPlayingTitleStyle">{{ bookName }}</p>
-                    <button :style="topBarAddFilesButtonStyle" v-on:click="onAddFileClick">
-                        <p :style="Styles.buttonText">Add file(s)</p>
-                    </button>
+                    <div :style="topBarActionsContainerStyle">
+                        <button :style="topBarAddFilesButtonStyle" v-on:click="onAddFileClick">
+                            <p :style="Styles.buttonText">Add file(s)</p>
+                        </button>
+                        <div :style="topBarContextButtonContainerStyle" v-on:click="onContextMenuClick">
+                            <Icon :icon="Icons.CONTEXT_VERTICAL"/>
+                            <DropdownMenu v-if="showDropdown" :items="dropdownItems" :onClickOutside="hideContextMenu"/>
+                        </div>
+                    </div>
                 </div>
                 <div :style="topBarCountdownsContainerStyles">
                     <p :style="topBarDurationCountdownStyle">{{ durationRemaining }}</p>
@@ -44,12 +50,16 @@ import {DateUtils} from "../../date";
 import dayjs from "dayjs";
 import {importFiles} from "../../../main/io";
 import {ipcRenderer} from "electron";
+import {Icons} from "../../components/icon.vue";
+import {DropdownItem} from "../../components/dropdown-menu.vue";
+import {Routes} from "../main";
 
 const duration = require('dayjs/plugin/duration')
 dayjs.extend(duration)
 
 let state = {
     Styles: Styles,
+    Icons: Icons,
     containerStyle: {
         height: '100%',
         flexDirection: 'column',
@@ -92,16 +102,27 @@ let state = {
         color: Colors.textSecondaryColor,
         fontSize: "20px"
     },
+    topBarActionsContainerStyle: {
+        marginTop: Dimens.sideMarginHalf,
+        display: "flex"
+    },
     topBarAddFilesButtonStyle: {
         ...Styles.buttonSecondary,
-        marginTop: Dimens.sideMarginHalf
+    },
+    topBarContextButtonContainerStyle: {
+        height: "max-content",
+        border: `1px solid ${Colors.accent}`,
+        borderRadius: `${Dimens.cornerRadius}`,
+        cursor: "pointer",
+        padding: "4px",
+        marginLeft: Dimens.sideMarginHalf
     },
     tableHeaderContainerStyle: {
         ...Styles.bodyText,
         display: "flex",
         paddingTop: Dimens.sideMarginHalf,
         paddingRight: Dimens.sideMargin,
-        paddingLeft: `calc(${Dimens.iconSize} + ${Dimens.sideMargin} + ${Dimens.sideMargin} + ${Dimens.sideMargin})`
+        paddingLeft: `calc(${Dimens.sideMargin} + ${Dimens.sideMargin})`
     },
     tableHeaderLabelsContainerStyle: {
         display: "flex",
@@ -138,6 +159,7 @@ let state = {
         marginTop: 'auto',
         bottom: 0
     },
+    showDropdown: false,
     filesData: LibraryRepositoryProvider.libraryRepository.libraryItems,
     selectedFileId: null as string | null,
 }
@@ -186,13 +208,37 @@ export default Vue.component("listening", {
                 border: `1px solid transparent`
             }
             return (file) => (this.selectedFile != null && this.selectedFile.id === file.id) ? a : b
+        },
+        dropdownItems: function (): Array<DropdownItem> {
+            const instanceThis = this
+            return [
+                {
+                    label: "Remove from library",
+                    icon: Icons.CROSS,
+                    action() {
+                        LibraryRepositoryProvider.libraryRepository.deleteCurrentSelectedLibraryItem()
+                        instanceThis.$router.push(Routes.LIBRARY)
+                    }
+                },
+            ] as Array<DropdownItem>
         }
     },
     methods: {
         onAddFileClick: function () {
             let res = importFiles(ipcRenderer, "All", [])
             LibraryRepositoryProvider.libraryRepository.addFilesToLibraryItem(res)
+        },
+        onContextMenuClick: function () {
+            this.$data.showDropdown = !this.$data.showDropdown
+        },
+        hideContextMenu() {
+            //TODO hide context menu when clicking anywhere on the page
+            console.log(this.$data.showDropdown)
+        },
+        deleteAction() {
+            LibraryRepositoryProvider.libraryRepository.deleteCurrentSelectedLibraryItem()
+            this.$router.push(Routes.LIBRARY)
         }
-    }
+    },
 })
 </script>

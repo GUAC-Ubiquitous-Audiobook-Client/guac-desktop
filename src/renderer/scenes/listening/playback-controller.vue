@@ -6,13 +6,13 @@
                 <img :style="imageStyle" :src="imageSrc"/>
 
                 <div :style="primaryActionsButtonsContainerStyle">
-                    <div :style="skipActionContainerStyle" v-on:click="onPlayClick">
+                    <div :style="skipActionContainerStyle" v-on:click="onNextFileClick">
                         <Icon :icon="Icons.SKIP_PREVIOUS"/>
                     </div>
                     <div :style="playActionContainerStyle" v-on:click="onPlayClick">
                         <Icon :icon="playIcon" :color="Colors.backgroundContent"/>
                     </div>
-                    <div :style="skipActionContainerStyle" v-on:click="onPlayClick">
+                    <div :style="skipActionContainerStyle" v-on:click="onPreviousFileClick">
                         <Icon :icon="Icons.SKIP_NEXT"/>
                     </div>
 
@@ -40,8 +40,16 @@
                     <p :style="durationRemainingLabelStyle">{{ durationRemaining }}</p>
                     <div :style="durationRemainingProgressContainerStyle">
                         <p :style="durationElapsedLabelStyle">{{ durationElapsed }}</p>
-                        <div :style="durationRemainingProgressBarOuterStyle">
-                            <div :style="durationRemainingProgressBarStyle"/>
+                        <div class="slidecontainer" :style="durationRemainingProgressBarOuterStyle">
+                            <input
+                                :style="durationRemainingProgressBarStyle"
+                                ref="input"
+                                v-model="durationProgressValue"
+                                type="range"
+                                min="0"
+                                max="100"
+                                class="slider"
+                            >
                         </div>
                     </div>
                 </div>
@@ -58,7 +66,6 @@ import {LibraryRepositoryProvider} from "../../data/provider";
 import {FileItem} from "../../data/data";
 import {Colors, Dimens, Styles} from "../../styles";
 import {Icons} from "../../components/icon.vue";
-import {Duration} from "dayjs/plugin/duration";
 import {DateUtils} from "../../date";
 
 const dayjs = require('dayjs')
@@ -150,17 +157,14 @@ let state = {
     },
     durationRemainingProgressBarOuterStyle: {
         width: "100%",
-        height: "12px",
-        border: `1px solid ${Colors.accentLight}`,
-        backgroundColor: Colors.buttonBackgroundHover,
+        // border: `1px solid ${Colors.accentLight}`,
+        // backgroundColor: Colors.buttonBackgroundHover,
         borderRadius: `${Dimens.cornerRadius}`,
         marginLeft: Dimens.sideMarginHalf,
+        display: "flex"
     },
-    _durationRemainingProgressBarStyle: {
-        width: "0%",
-        height: "100%",
-        borderRadius: `${Dimens.cornerRadius}`,
-        backgroundColor: Colors.accent
+    durationRemainingProgressBarStyle: {
+        width: "100%"
     },
     durationRemainingLabelStyle: {
         ...Styles.subtitleText,
@@ -172,7 +176,7 @@ let state = {
         whiteSpace: "nowrap"
     },
     _playbackSpeed: 1,
-    _volume: 0.0,
+    _volume: 0.5,
     _trackDuration: 0,
     _trackCurrentSecond: 0,
     playing: false,
@@ -233,11 +237,12 @@ export default Vue.component("PlaybackController", {
                 return Icons.PLAY
             }
         },
-        durationRemainingProgressBarStyle: function () {
-            const a = this.$data._trackCurrentSecond * 100 / this.$data._trackDuration
-            return {
-                ...this.$data._durationRemainingProgressBarStyle,
-                width: `${a}%`
+        durationProgressValue: {
+            get: function () {
+                return this.$data._trackCurrentSecond * 100 / this.$data._trackDuration
+            },
+            set: function (newValue) {
+                player.currentTime = player.duration / 100 * newValue
             }
         }
     },
@@ -248,7 +253,13 @@ export default Vue.component("PlaybackController", {
         onPlaybackSpeedUpClick: _onPlaybackSpeedUpClick,
         onPlaybackSpeedDownClick: _onPlaybackSpeedDownClick,
         onPlaybackVolumeDown: _onPlaybackVolumeDown,
-        onPlaybackVolumeUp: _onPlaybackVolumeUp
+        onPlaybackVolumeUp: _onPlaybackVolumeUp,
+        onNextFileClick: function () {
+
+        },
+        onPreviousFileClick: function () {
+
+        }
     },
     created() {
         registerKeybindObservers()
