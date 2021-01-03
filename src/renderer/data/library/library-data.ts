@@ -1,7 +1,3 @@
-export interface LibraryItems {
-    data: LibraryItem[]
-}
-
 export interface LibraryItem {
     id: string
     name: string

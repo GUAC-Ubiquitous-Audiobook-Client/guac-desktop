@@ -62,8 +62,8 @@
 import Vue, {PropType} from "vue";
 import {ipcRenderer} from "electron";
 import {KeybindAction} from "../../../main/keybinds";
-import {LibraryRepositoryProvider} from "../../data/provider";
-import {FileItem} from "../../data/data";
+import {LibraryRepositoryProvider} from "../../data/library/provider";
+import {FileItem} from "../../data/library/library-data";
 import {Colors, Dimens, Styles} from "../../styles";
 import {Icons} from "../../components/icon.vue";
 import {DateUtils} from "../../date";

@@ -34,7 +34,7 @@ import {ipcRenderer} from 'electron'
 import LibraryItemView from './library-item'
 import {importFiles} from "../../../main/io";
 import {Colors, Dimens, Styles} from '../../styles';
-import {LibraryRepositoryProvider} from "../../data/provider";
+import {LibraryRepositoryProvider} from "../../data/library/provider";
 
 let state = {
     Styles: Styles,

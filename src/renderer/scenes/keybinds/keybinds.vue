@@ -4,7 +4,7 @@
             <div :style="topBarTitleContainerStyle">
                 <p :style="Styles.titleText">Keybinds</p>
             </div>
-            <button :style="addKeybindButtonStyle" v-on:click="onImportFilesClick">
+            <button :style="addKeybindButtonStyle" v-on:click="onAddKeybindsClick">
                 <p :style="Styles.buttonPrimaryText">Add keybind</p>
             </button>
             <p :style="topBarNoteLabelStyle">
@@ -13,13 +13,9 @@
             <div :style="topBarDividerStyle"/>
         </div>
 
-        <p>set keybinds</p>
-        <select v-model="selectedAction">
-            <option v-for="action in actions" :value="action">{{ action }}</option>
-        </select>
-        <p>Selected Text = {{ selectedAction }}<br></p>
-        <input v-model="keybind" placeholder="type character"/>
-        <button v-on:click="saveKeybind">save keybind</button>
+        <div>
+            <KeybindsItemView v-for="(item, index) in items" v-bind:keybindItemId="item" v-bind:key="item"/>
+        </div>
     </div>
 </template>
 
@@ -27,10 +23,13 @@
 import Vue from 'vue'
 import {KeybindAction, registerKeybind} from "../../../main/keybinds";
 import {ipcRenderer} from "electron";
+import KeybindsItemView from './keybinds-item'
 import {Colors, Dimens, Styles} from "../../styles";
+import {KeybindsRepositoryProvider} from "../../data/keybinds/provider";
 
 let state = {
     Styles: Styles,
+    data: KeybindsRepositoryProvider.keybindsRepository.keybindsData,
     containerStyle: {
         height: '100%',
         flexDirection: 'column',
@@ -62,23 +61,26 @@ let state = {
         marginTop: Dimens.sideMarginHalf,
         marginLeft: Dimens.sideMargin
     },
-    selectedAction: "",
-    actions: Object.values(KeybindAction),
     keybind: "",
 }
 
 export default Vue.component("home", {
+    components: {KeybindsItemView},
     data: function () {
         return state
     },
     methods: {
-        saveKeybind: _saveKeybind
+        onAddKeybindsClick: function () {
+            KeybindsRepositoryProvider.keybindsRepository.addKeybind()
+        }
     },
-    computed: {}
+    computed: {
+        items: function () {
+            return this.$data.data.data.map(function (val): string {
+                return val.id
+            })
+        }
+    }
 })
-
-function _saveKeybind() {
-    registerKeybind(ipcRenderer, this.keybind, this.selectedAction)
-}
 
 </script>

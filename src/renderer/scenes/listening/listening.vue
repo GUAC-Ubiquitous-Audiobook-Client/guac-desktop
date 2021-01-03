@@ -45,7 +45,7 @@ import Vue from 'vue'
 import FileItem from './file-item'
 import PlaybackController from './playback-controller'
 import {Colors, Dimens, Styles} from "../../styles";
-import {LibraryRepositoryProvider} from "../../data/provider";
+import {LibraryRepositoryProvider} from "../../data/library/provider";
 import {DateUtils} from "../../date";
 import dayjs from "dayjs";
 import {importFiles} from "../../../main/io";

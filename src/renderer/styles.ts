@@ -9,6 +9,7 @@ export namespace Colors {
     export const textPrimaryColor: string = "#ffffff"
     export const textSecondaryColor: string = "#bababa"
     export const borderColour: string = "#dcdcdc"
+    export const dangerRed: string = "#FF5757"
 
     // components
     export const textButtonColor: string = "#ffffff"

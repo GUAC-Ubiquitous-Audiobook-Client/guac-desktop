@@ -1,6 +1,6 @@
 import {v4 as uuidv4} from 'uuid';
 import storage from 'electron-json-storage';
-import {FileItem, LibraryItem} from "./data";
+import {FileItem, LibraryItem} from "./library-data";
 
 const fs = require("fs")
 const mm = require("musicmetadata")

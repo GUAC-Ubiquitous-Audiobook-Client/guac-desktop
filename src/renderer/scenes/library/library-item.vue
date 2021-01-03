@@ -18,9 +18,9 @@
 <script lang="ts">
 import Vue from "vue";
 import {Colors, Dimens, Styles} from "../../styles";
-import {LibraryRepositoryProvider} from "../../data/provider";
+import {LibraryRepositoryProvider} from "../../data/library/provider";
 import {Routes} from "../main";
-import {LibraryItem} from "../../data/data";
+import {LibraryItem} from "../../data/library/library-data";
 
 export default Vue.component("LibraryItemView", {
     name: "LibraryItemView",

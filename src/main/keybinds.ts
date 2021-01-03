@@ -17,7 +17,6 @@ export function registerKeybind(ipcRenderer: IpcRenderer, keybind: Accelerator, 
 }
 
 export const keybindsProcess: MainProcess = {
-
     init() {
         ipcMain.on('setKeybind', (event, args) => {
             let arg = args[0]
@@ -31,7 +30,7 @@ export const keybindsProcess: MainProcess = {
 }
 
 function _registerKeybind(keybind: Accelerator, action: KeybindAction) {
-    //todo save keybind locally
+    // todo save keybind locally
     globalShortcut.unregister(keybind)
     globalShortcut.register(keybind, () => {
         if (mainWindow != null) {

@@ -19,8 +19,8 @@
 <script lang="ts">
 import Vue, {PropType} from "vue";
 import {Dimens, Styles} from "../../styles";
-import {LibraryRepositoryProvider} from "../../data/provider";
-import {FileItem} from "../../data/data";
+import {LibraryRepositoryProvider} from "../../data/library/provider";
+import {FileItem} from "../../data/library/library-data";
 import {Icons} from "../../components/icon.vue";
 import {DropdownItem} from "../../components/dropdown-menu.vue";
 import {DateUtils} from "../../date";

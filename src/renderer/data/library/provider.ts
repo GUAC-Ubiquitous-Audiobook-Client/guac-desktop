@@ -9,6 +9,7 @@ export class LibraryRepositoryProvider {
     private static get instance() {
         return this._instance || (this._instance = new this());
     }
+
     public static get libraryRepository() {
         return this.instance._libraryRepository
     }
