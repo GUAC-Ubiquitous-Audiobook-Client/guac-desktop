@@ -40,6 +40,7 @@ export default Vue.component("ButtonScroller", {
                 padding: "4px",
                 position: "relative",
                 overflowY: "scroll",
+                overflowX: "hidden",
             },
             contentContainerStyle: {
                 alignItems: "center",
