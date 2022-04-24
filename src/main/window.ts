@@ -17,7 +17,7 @@ export const windowProcess: MainProcess = {
             const isDevelopment = process.env.NODE_ENV !== 'production'
 
             function debugWindow(): BrowserWindow {
-                const display = screen.getAllDisplays()[1]
+                const display = screen.getAllDisplays()[0]
                 const w = display.bounds.width / 2
                 const h = display.bounds.height
                 const x = display.bounds.x + w
